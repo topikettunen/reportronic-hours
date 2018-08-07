@@ -1,6 +1,6 @@
 {
     "reportronic":{
-	"user":"INSERT YOUR REPORTRONIC URL HERE"
+	"url":"INSERT YOUR REPORTRONIC URL HERE",
         "user":"INSERT YOUR REPORTRONIC USER HERE",
         "password":"INSERT YOUR REPORTRONIC PASSWORD HERE"
     }
