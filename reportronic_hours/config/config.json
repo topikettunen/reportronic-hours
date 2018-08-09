@@ -4,8 +4,9 @@
         "user": "INSERT YOUR REPORTRONIC USER HERE",
         "password": "INSERT YOUR REPORTRONIC PASSWORD HERE"
     },
-    "gmail": {
-	"mail": "INSERT YOUR GMAIL ACCOUNT HERE",
-	"password": "INSERT YOUR GMAIL PASSWORD HERE"
+    "mail": {
+	"mail_user": "INSERT YOUR GMAIL ACCOUNT HERE",
+	"password": "INSERT YOUR GMAIL PASSWORD HERE",
+	"mail_to": "INSERT YOUR MAIL RECEIVER HERE"
     }
 }

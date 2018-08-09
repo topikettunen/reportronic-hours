@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "570e0861fbd76d834df82795acc5b4e2c3fb7ec64aa49025468a7951b09ffbab"
+            "sha256": "c61bcb891472a1abb01175e12cd9fb99e0b0e8add24b3040818c4346226429f3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,10 @@
         ]
     },
     "default": {
+        "reportronic-hours": {
+            "editable": true,
+            "path": "."
+        },
         "selenium": {
             "hashes": [
                 "sha256:c53d13a2627d835fee3d1d6291214c62196dfeb6f5f35572bacf31ac60c030c0",

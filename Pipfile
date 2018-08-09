@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 selenium = "*"
+setuptools = "*"
+reportronic-hours = {editable = true, path = "."}
 
 [dev-packages]
 
