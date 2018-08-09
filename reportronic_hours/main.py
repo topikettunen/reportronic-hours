@@ -51,6 +51,10 @@ class Reportronic:
     def wait_for_element_to_be_visible(self):
         pass
 
+class Mail:
+    def __init__(self):
+        pass
+
 class ReportonicCLI:
     def __init__(self):
         self.repo = Reportronic()
