@@ -1,10 +1,11 @@
 import logging
+import time
 from datetime import datetime
 from selenium.common.exceptions import NoSuchElementException
 
-from reportronic_hours.reportonic import Reportronic
+from reportronic_hours.utils.reportronic import Reportronic
 
-class ReportonicCLI:
+class ReportronicCLI:
     def __init__(self):
         self.repo = Reportronic()
         self.logger = logging.getLogger()
@@ -32,27 +33,28 @@ class ReportonicCLI:
         self.repo.driver.save_screenshot(screenshot_filename)
         self.logger.info('Screenshot saved as {}'.format(screenshot_filename))
 
-def main(self):
+def main():
+    cli = ReportronicCLI()
     try:
-        self.login_to_reportronic()
-        time.sleep(5)
+        cli.login_to_reportronic()
+        time.sleep(10)
         browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
-        self.locate_and_navigate_to_element_with_id(browse_worktime_id)
-        time.sleep(5)
+        cli.locate_and_navigate_to_element_with_id(browse_worktime_id)
+        time.sleep(10)
         show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
-        self.locate_and_navigate_to_element_with_id(show_worktime_announcement_id)
-        time.sleep(5)
+        cli.locate_and_navigate_to_element_with_id(show_worktime_announcement_id)
+        time.sleep(10)
         send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
-        self.locate_and_navigate_to_element_with_id(send_for_approval_id)
-        time.sleep(5)
+        cli.locate_and_navigate_to_element_with_id(send_for_approval_id)
+        time.sleep(10)
         worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
-        self.locate_and_navigate_to_element_with_id(worktime_announcement_next_id)
-        time.sleep(5)
+        cli.locate_and_navigate_to_element_with_id(worktime_announcement_next_id)
+        time.sleep(10)
         worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
-        self.locate_and_navigate_to_element_with_id(worktime_announcement_save_id)
-        time.sleep(5)
+        cli.locate_and_navigate_to_element_with_id(worktime_announcement_save_id)
+        time.sleep(10)
     except NoSuchElementException:
-        self.logger.error('Element not found')
+        cli.logger.error('Element not found')
     finally:
-        self.take_screenshot()
-        self.repo.driver.quit()
+        cli.take_screenshot()
+        cli.repo.driver.quit()

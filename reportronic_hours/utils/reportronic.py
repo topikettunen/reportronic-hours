@@ -1,4 +1,5 @@
 import json
+import os
 import time
 
 from selenium import webdriver
@@ -9,7 +10,9 @@ class Reportronic:
     def __init__(self,
                  driver=webdriver.Firefox()):
         self.driver = driver
-        with open('./config/config-test.json') as config:
+        absolute_path = os.path.abspath(os.path.dirname(__file__))
+        config_path = os.path.join(absolute_path, "../config/config-test.json")
+        with open(config_path) as config:
             data = json.load(config)
         self.url = data['reportronic']['url']
         self.user = data['reportronic']['user']
