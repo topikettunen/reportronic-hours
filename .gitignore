@@ -2,3 +2,4 @@
 *.log
 config-test.json
 *.egg*
+__pycache__
