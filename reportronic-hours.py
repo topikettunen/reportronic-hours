@@ -22,7 +22,9 @@ import os
 import smtplib
 import time
 from datetime import datetime
+from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -133,7 +135,7 @@ class Reportronic:
         addition of working hours.
         """
         self.logger.info('Taking a screenshot.')
-        screenshot_filename = datetime.now().strftime("pics/%Y%m%d-%H%M%S-hours.png")
+        screenshot_filename = 'pics/reportronic-hours.png'
         os.makedirs(os.path.dirname(screenshot_filename), exist_ok=True)
         self.driver.save_screenshot(screenshot_filename)
         self.logger.info('Screenshot saved as {}'.format(screenshot_filename))
@@ -150,14 +152,18 @@ class Mail:
 
     def mail_body(self):
         """Writes log output to email's message body."""
-        with open(Reportronic().log_filename) as log:
-            body = log.readlines()
-        msg_body = ''.join(body)
-        msg = MIMEText(msg_body)
+        msg = MIMEMultipart()
         msg['Subject'] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S Reportronic Hours Output")
         msg['From'] = self.mail_user
         msg['To'] = self.mail_to
+        with open(Reportronic().log_filename) as log:
+            body = log.readlines()
+        msg_body = ''.join(body)
+        msg.attach(MIMEText(msg_body))
+        with open('pics/reportronic-hours.png', 'rb') as fp:
+            img = MIMEImage(fp.read())
+        msg.attach(img)
         return msg
 
     def send(self):
@@ -198,6 +204,7 @@ class ScriptRuns:
         repo.navigate_to_id(browse_worktime_id)
 
         if repo.are_todays_hours_saved():
+            repo.take_screenshot()
             repo.driver.quit()
             return
         
