@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import calendar
 import json
 import logging
 import os
@@ -46,9 +47,16 @@ class Reportronic:
         self.logger = logging.getLogger()
         self.formatter = logging.Formatter(
             '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-        self.stream_handler = logging.StreamHandler()
-        self.stream_handler.setFormatter(self.formatter)
-        self.logger.addHandler(self.stream_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(self.formatter)
+        stream_handler.setLevel(logging.INFO)
+        self.log_filename = 'logs/reportronic-hours.log'
+        os.makedirs(os.path.dirname(self.log_filename), exist_ok=True)
+        file_handler = logging.FileHandler(self.log_filename)
+        file_handler.setFormatter(self.formatter)
+        file_handler.setLevel(logging.INFO)
+        self.logger.addHandler(stream_handler)
+        self.logger.addHandler(file_handler)
         self.logger.setLevel(logging.INFO)
 
     def is_element_visible(self, element_id, timeout=300):
@@ -75,7 +83,7 @@ class Reportronic:
         today = datetime.now().strftime('%d.%m.%Y')
         try:
             self.driver.find_element_by_xpath("//*[text()='{}']".format(today))
-            self.logger.error('Working hours for today have already been saved')
+            self.logger.info('Working hours for today have already been saved')
             return True
         except NoSuchElementException:
             return False
@@ -104,9 +112,13 @@ class Reportronic:
         """Finds element with given value from dropdown menu and clicks it to
         choose it.
         """
-        self.logger.info(
-            'Trying to find option 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus from dropdown')
-        xpath = "//option[@value=" + option_value + "]"
+        if option_value == 599:
+            self.logger.info(
+                'Trying to find option 4058  Osaamisen pelimerkit from dropdown')
+        elif option_value == 498:
+            self.logger.info(
+                'Trying to find option 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus from dropdown')
+        xpath = "//option[@value='{}']".format(option_value)
         self.driver.find_element_by_xpath(xpath).click()
 
     def save_working_hours(self):
@@ -121,12 +133,10 @@ class Reportronic:
         addition of working hours.
         """
         self.logger.info('Taking a screenshot.')
-        screenshot_filename = datetime.now().strftime("%Y%m%d-%H%M%S-hours.png")
+        screenshot_filename = datetime.now().strftime("pics/%Y%m%d-%H%M%S-hours.png")
+        os.makedirs(os.path.dirname(screenshot_filename), exist_ok=True)
         self.driver.save_screenshot(screenshot_filename)
         self.logger.info('Screenshot saved as {}'.format(screenshot_filename))
-
-    def take_screenshot_of_saved_working_hours(self):
-        pass
 
 class Mail:
     def __init__(self):
@@ -140,14 +150,17 @@ class Mail:
 
     def mail_body(self):
         """Writes log output to email's message body."""
-        msg = MIMEText('Hello, World')
+        with open(Reportronic().log_filename) as log:
+            body = log.readlines()
+        msg_body = ''.join(body)
+        msg = MIMEText(msg_body)
         msg['Subject'] = datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S Reportronic Hours Output")
         msg['From'] = self.mail_user
         msg['To'] = self.mail_to
         return msg
 
-    def send_mail(self):
+    def send(self):
         """Sends mail from one mail account to another. Fetches these addresses
         from config.json
         """        
@@ -183,27 +196,52 @@ class ScriptRuns:
         repo.login_to_reportronic()
         browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
         repo.navigate_to_id(browse_worktime_id)
+
+        if repo.are_todays_hours_saved():
+            repo.driver.quit()
+            return
+        
         add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
         repo.navigate_to_id(add_worktime_id)
-        start_worktime_input_element = repo.driver.find_element_by_id(
-            'prlWTEP_uwtWorkTime__ctl1_txtStart')
-        start_worktime_input_element.send_keys(start)
-        end_worktime_input_element = repo.driver.find_element_by_id(
-            'prlWTEP_uwtWorkTime__ctl1_txtEnd')
-        end_worktime_input_element.send_keys(end)
-        check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
-        repo.navigate_to_id(check_remove_break_time_id)
-        # If its friday use option value 599 else 498.
-        if datetime.now().isoweekday() == 5:
-            # Option value 599 equalst to
-            # 4058  Osaamisen pelimerkit
-            repo.click_option_value_from_dropdown_menu('599')
-        else:
-            # Option value 498 equals to
-            # 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus
-            repo.click_option_value_from_dropdown_menu('498')
-        working_hours_amount_id = repo.driver.find_element_by_id(
-            'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration')
-        working_hours_amount_id.send_keys('10:00')
+        start_worktime_input_element_id = 'prlWTEP_uwtWorkTime__ctl1_txtStart'
+        
+        if repo.is_element_visible(start_worktime_input_element_id):
+            start_worktime_input_element = repo.driver.find_element_by_id(start_worktime_input_element_id)
+            start_worktime_input_element.send_keys(start)
+            end_worktime_input_element = repo.driver.find_element_by_id(
+                'prlWTEP_uwtWorkTime__ctl1_txtEnd')
+            end_worktime_input_element.send_keys(end)
+            check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
+            repo.navigate_to_id(check_remove_break_time_id)
+
+            # If its Friday use option value 599 else 498.
+            if datetime.now().isoweekday() == 5:
+                # Option value 599 equals to
+                # 4058  Osaamisen pelimerkit
+                repo.click_option_value_from_dropdown_menu('599')
+            else:
+                # Option value 498 equals to
+                # 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus
+                repo.click_option_value_from_dropdown_menu('498')
+
+        working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration'
+        if repo.is_element_visible(working_hours_amount_id):
+            working_hours_amout = repo.driver.find_element_by_id()
+            working_hours_amount.send_keys('10:00')
+            browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+            repo.navigate_to_id(browse_worktime_id)
+                
         repo.take_screenshot()
         repo.driver.quit()
+
+def main():
+    run = ScriptRuns()
+    run.daily()
+    now = datetime.now()
+    if now.day == calendar.monthrange(now.year, now.month)[1]:
+        run.monthly()
+    mail = Mail()
+    mail.send()
+
+if __name__ == '__main__':
+    main()
