@@ -36,9 +36,8 @@ import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.ui as ui
 
 class Reportronic:
-    def __init__(self,
-                 driver=webdriver.Firefox()):
-        self.driver = driver
+    def __init__(self):
+        self.driver = webdriver.Firefox()
         absolute_path = os.path.abspath(os.path.dirname(__file__))
         config_path = os.path.join(absolute_path, "./config-test.json")
         with open(config_path) as config:
@@ -181,68 +180,102 @@ class ScriptRuns:
         """Does monthly working hour saving, which saves all the working hours
         given from the past month.
         """
-        repo = Reportronic()
-        repo.login_to_reportronic()
-        browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
-        repo.navigate_to_id(browse_worktime_id)
-        show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
-        repo.navigate_to_id(show_worktime_announcement_id)
-        send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
-        repo.navigate_to_id(send_for_approval_id)
-        worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
-        repo.navigate_to_id(worktime_announcement_next_id)
-        worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
-        repo.navigate_to_id(worktime_announcement_save_id)
-        repo.take_screenshot()
-        repo.driver.quit()
-            
-    def daily(self, start='08:00', end='18:00'):
-        """Does daily working hour saving. Saves 08-18 hours by default."""
-        repo = Reportronic()
-        repo.login_to_reportronic()
-        browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
-        repo.navigate_to_id(browse_worktime_id)
-
-        if repo.are_todays_hours_saved():
-            repo.take_screenshot()
+        try:
+            repo = Reportronic()
+            repo.login_to_reportronic()
+            browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+            repo.navigate_to_id(browse_worktime_id)
+            show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
+            repo.navigate_to_id(show_worktime_announcement_id)
+            send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
+            repo.navigate_to_id(send_for_approval_id)
+            worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
+            repo.navigate_to_id(worktime_announcement_next_id)
+            worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
+            repo.navigate_to_id(worktime_announcement_save_id)
+            worktimes_id = 'prlWTEPuwtWorkTimectl0ctlWorkTimeViewSelector1UWTS1_1'
+            if repo.is_element_visible(worktimes_id):
+                repo.take_screenshot()
+        finally:
             repo.driver.quit()
-            return
+            
+    def daily(self, start='08:00', end='16:07'):
+        """Does daily working hour saving. Saves 08-18 hours by default."""
+        try:
+            repo = Reportronic()
+            repo.login_to_reportronic()
+            browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+            repo.navigate_to_id(browse_worktime_id)
+            
+            if repo.are_todays_hours_saved():
+                repo.take_screenshot()
+                repo.driver.quit()
+                return
+            
+            add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
+            repo.navigate_to_id(add_worktime_id)
+            start_worktime_input_element_id = 'prlWTEP_uwtWorkTime__ctl1_txtStart'
         
-        add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
-        repo.navigate_to_id(add_worktime_id)
-        start_worktime_input_element_id = 'prlWTEP_uwtWorkTime__ctl1_txtStart'
-        
-        if repo.is_element_visible(start_worktime_input_element_id):
-            start_worktime_input_element = repo.driver.find_element_by_id(start_worktime_input_element_id)
-            start_worktime_input_element.send_keys(start)
-            end_worktime_input_element = repo.driver.find_element_by_id(
-                'prlWTEP_uwtWorkTime__ctl1_txtEnd')
-            end_worktime_input_element.send_keys(end)
-            check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
-            repo.navigate_to_id(check_remove_break_time_id)
-
-            # If its Friday use option value 599 else 498.
-            if datetime.now().isoweekday() == 5:
-                # Option value 599 equals to
-                # 4058  Osaamisen pelimerkit
-                repo.click_option_value_from_dropdown_menu('599')
-            else:
+            if repo.is_element_visible(start_worktime_input_element_id):
+                start_worktime_input_element = repo.driver.find_element_by_id(
+                    start_worktime_input_element_id)
+                start_worktime_input_element.send_keys(start)
+                end_worktime_input_element = repo.driver.find_element_by_id(
+                    'prlWTEP_uwtWorkTime__ctl1_txtEnd')
+                end_worktime_input_element.send_keys(end)
+                check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
+                repo.driver.find_element_by_id(check_remove_break_time_id).click()
+                
                 # Option value 498 equals to
                 # 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus
                 repo.click_option_value_from_dropdown_menu('498')
+                # Had to use sleep here since JS sucks.
+                time.sleep(10)
 
-        working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration'
-        if repo.is_element_visible(working_hours_amount_id):
-            working_hours_amout = repo.driver.find_element_by_id()
-            working_hours_amount.send_keys('10:00')
+                working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration'
+                working_hours_amount = repo.driver.find_element_by_id(
+                working_hours_amount_id)
+                working_hours_amount.send_keys('08:07')
+                repo.save_working_hours()
+            
+                browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+                repo.navigate_to_id(browse_worktime_id)
+
+                worktimes_id = 'prlWTEPuwtWorkTimectl0ctlWorkTimeViewSelector1UWTS1_1'
+                if repo.is_element_visible(worktimes_id):
+                    if repo.are_todays_hours_saved():
+                        repo.take_screenshot()
+        finally:
+            repo.driver.quit()
+
+    def friday(self):
+        """Option values for Friday are 498 and 599"""
+        pass
+
+    def delete_duplicate(self):
+        try:
+            repo = Reportronic()
+            repo.login_to_reportronic()
             browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
             repo.navigate_to_id(browse_worktime_id)
-                
-        repo.take_screenshot()
-        repo.driver.quit()
+            delete_button_id = 'prlWTEP_uwtWorkTime__ctl0_dgWorkTime_RLinkbutton2_0'
+            if repo.is_element_visible(delete_button_id):
+                repo.driver.find_element_by_id(
+                    'prlWTEP_uwtWorkTime__ctl0_dgWorkTime_RLinkbutton2_0').click()
+                time.sleep(2)
+                alert = Alert(repo.driver)
+                time.sleep(2)
+                alert.accept()
+                time.sleep(10)
+                worktimes_id = 'prlWTEPuwtWorkTimectl0ctlWorkTimeViewSelector1UWTS1_1'
+                if repo.is_element_visible(worktimes_id):
+                    repo.take_screenshot()
+        finally:
+            repo.driver.quit()   
 
 def main():
     run = ScriptRuns()
+    run.delete_duplicate()
     run.daily()
     now = datetime.now()
     if now.day == calendar.monthrange(now.year, now.month)[1]:
@@ -251,4 +284,44 @@ def main():
     mail.send()
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--daily',
+                        help='Run daily run of saving working hours.',
+                        action='store_true')
+    parser.add_argument('--monthly',
+                        help='Run monthly run of saving working hours.',
+                        action='store_true')
+    parser.add_argument('--delete-duplicate',
+                        help='Delete possible duplicate working hours.',
+                        action='store_true')
+    parser.add_argument('--friday',
+                        help='Run specific run for saving Friday\'s working hours.',
+                        action='store_true')
+    
+    if len(sys.argv) < 2:
+        parser.print_help()
+        sys.exit(1)
+        
+    args = parser.parse_args()
+    run = ScriptRuns()
+    mail = Mail()
+    
+    if args.daily and len(sys.argv) == 2:
+        run.daily()
+        mail.send()
+    elif args.monthly and len(sys.argv) == 2:
+        run.monthly()
+        mail.send()
+    elif args.delete_duplicate and len(sys.argv) == 2:
+        run.delete_duplicate()
+        mail.send()
+    elif args.friday and len(sys.argv) == 2:
+        run.friday()
+        mail.send()
+    else:
+        parser.print_help()
+        sys.exit(1)
+
