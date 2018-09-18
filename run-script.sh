@@ -5,7 +5,7 @@ while [[ "$(curl -s -o /dev/null -w %{http_code} https://repo.haaga-helia.fi/)" 
     sleep 5
 done
 
-rm -r pics/* || true
-rm -r logs/* || true
+rm -r pics/* 2> /dev/null || true
+rm -r logs/* 2> /dev/null || true
 
-exec python3 reportronic-hours.py
+xvfb-run --server-args="-screen 0 1920x1024x24" python3 reportronic-hours.py $1
