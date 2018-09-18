@@ -209,7 +209,6 @@ class ScriptRuns:
             
             if repo.are_todays_hours_saved():
                 repo.take_screenshot()
-                repo.driver.quit()
                 return
             
             add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
@@ -272,16 +271,6 @@ class ScriptRuns:
                     repo.take_screenshot()
         finally:
             repo.driver.quit()   
-
-def main():
-    run = ScriptRuns()
-    run.delete_duplicate()
-    run.daily()
-    now = datetime.now()
-    if now.day == calendar.monthrange(now.year, now.month)[1]:
-        run.monthly()
-    mail = Mail()
-    mail.send()
 
 if __name__ == '__main__':
     import argparse
