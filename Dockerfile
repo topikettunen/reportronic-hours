@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y \
+    firefox \
     python3 \
     python3-pip \
     xvfb \
@@ -16,7 +17,7 @@ COPY config-test.json /app/
 
 COPY requirements.txt /app/
 COPY reportronic-hours.py /app/
-COPY run-script.sh /app/
+COPY xvfb-run-script.sh /app/
 
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.22.0/geckodriver-v0.22.0-linux64.tar.gz
 
@@ -27,4 +28,4 @@ WORKDIR /app
 
 RUN pip3 install -r requirements.txt
 
-ENTRYPOINT [ "/app/run-script.sh" ]
+ENTRYPOINT [ "/app/xvfb-run-script.sh" ]
