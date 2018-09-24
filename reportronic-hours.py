@@ -187,20 +187,18 @@ class ScriptRuns:
         try:
             repo = Reportronic()
             repo.login_to_reportronic()
-            # browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
-            # repo.navigate_to_id(browse_worktime_id)
-            # show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
-            # repo.navigate_to_id(show_worktime_announcement_id)
-            # send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
-            # repo.navigate_to_id(send_for_approval_id)
-            # worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
-            # repo.navigate_to_id(worktime_announcement_next_id)
-            # worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
-            # repo.navigate_to_id(worktime_announcement_save_id)
-
             browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
             repo.navigate_to_id(browse_worktime_id)
             show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
+            repo.navigate_to_id(show_worktime_announcement_id)
+            send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
+            repo.navigate_to_id(send_for_approval_id)
+            worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
+            repo.navigate_to_id(worktime_announcement_next_id)
+            worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
+            repo.navigate_to_id(worktime_announcement_save_id)
+
+            repo.navigate_to_id(browse_worktime_id)
             repo.navigate_to_id(show_worktime_announcement_id)
             announcement_filter_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_cboFilter'
             repo.click_option_value_from_dropdown_menu(announcement_filter_id, '0')
