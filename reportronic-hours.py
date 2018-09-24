@@ -88,7 +88,7 @@ class Reportronic:
             return True
         except NoSuchElementException:
             return False
-    
+
     def login_to_reportronic(self):
         """Authenticate user with given username and password from
         config.json.
@@ -109,7 +109,7 @@ class Reportronic:
             element = self.driver.find_element_by_id(element_id)
             element.click()
 
-    def click_option_value_from_dropdown_menu(self, option_value):
+    def click_option_value_from_dropdown_menu(self, select_id, option_value):
         """Finds element with given value from dropdown menu and clicks it to
         choose it.
         """
@@ -119,7 +119,11 @@ class Reportronic:
         elif option_value == 498:
             self.logger.info(
                 'Trying to find option 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus from dropdown')
-        xpath = "//option[@value='{}']".format(option_value)
+        else:
+            self.logger.info(
+                'Trying to find select with id of {}'.format(select_id))
+        xpath = "//select[@id='{}']/option[@value='{}']".format(select_id,
+                                                               option_value)
         self.driver.find_element_by_xpath(xpath).click()
 
     def save_working_hours(self):
@@ -183,23 +187,33 @@ class ScriptRuns:
         try:
             repo = Reportronic()
             repo.login_to_reportronic()
+            # browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+            # repo.navigate_to_id(browse_worktime_id)
+            # show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
+            # repo.navigate_to_id(show_worktime_announcement_id)
+            # send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
+            # repo.navigate_to_id(send_for_approval_id)
+            # worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
+            # repo.navigate_to_id(worktime_announcement_next_id)
+            # worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
+            # repo.navigate_to_id(worktime_announcement_save_id)
+
             browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
             repo.navigate_to_id(browse_worktime_id)
             show_worktime_announcement_id = 'prlWTEP_uwtWorkTimetd2'
             repo.navigate_to_id(show_worktime_announcement_id)
-            send_for_approval_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_lnkTeeIlmoitus'
-            repo.navigate_to_id(send_for_approval_id)
-            worktime_announcement_next_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbNext'
-            repo.navigate_to_id(worktime_announcement_next_id)
-            worktime_announcement_save_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSave'
-            repo.navigate_to_id(worktime_announcement_save_id)
-            worktimes_id = 'prlWTEPuwtWorkTimectl0ctlWorkTimeViewSelector1UWTS1_1'
-            if repo.is_element_visible(worktimes_id):
+            announcement_filter_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_cboFilter'
+            repo.click_option_value_from_dropdown_menu(announcement_filter_id, '0')
+            search_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_rlbSearch'
+            repo.navigate_to_id(search_id)
+
+            datagrid_id = 'prlWorkTimeAnnouncementPage_uwtWorkTime__ctl2_DataGrid'
+            if repo.is_element_visible(datagrid_id):
                 repo.take_screenshot()
         finally:
             repo.driver.quit()
             
-    def daily(self, start='08:00', end='16:07'):
+    def daily(self, start='08:00', end='18:07'):
         """Does daily working hour saving. Saves 08-18 hours by default."""
         try:
             repo = Reportronic()
@@ -210,11 +224,11 @@ class ScriptRuns:
             if repo.are_todays_hours_saved():
                 repo.take_screenshot()
                 return
-            
+
             add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
             repo.navigate_to_id(add_worktime_id)
             start_worktime_input_element_id = 'prlWTEP_uwtWorkTime__ctl1_txtStart'
-        
+
             if repo.is_element_visible(start_worktime_input_element_id):
                 start_worktime_input_element = repo.driver.find_element_by_id(
                     start_worktime_input_element_id)
@@ -224,19 +238,20 @@ class ScriptRuns:
                 end_worktime_input_element.send_keys(end)
                 check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
                 repo.driver.find_element_by_id(check_remove_break_time_id).click()
-                
+
                 # Option value 498 equals to
                 # 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus
-                repo.click_option_value_from_dropdown_menu('498')
+                worktime_task_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_cboProject'
+                repo.click_option_value_from_dropdown_menu(worktime_task_id, '498')
                 # Had to use sleep here since JS sucks.
                 time.sleep(10)
 
                 working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration'
                 working_hours_amount = repo.driver.find_element_by_id(
-                working_hours_amount_id)
-                working_hours_amount.send_keys('08:07')
+                    working_hours_amount_id)
+                working_hours_amount.send_keys('10:07')
                 repo.save_working_hours()
-            
+
                 browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
                 repo.navigate_to_id(browse_worktime_id)
 
@@ -247,9 +262,62 @@ class ScriptRuns:
         finally:
             repo.driver.quit()
 
-    def friday(self):
+    def friday(self, start='08:00', end='18:07'):
         """Option values for Friday are 498 and 599"""
-        pass
+        try:
+            repo = Reportronic()
+            repo.login_to_reportronic()
+            browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+            repo.navigate_to_id(browse_worktime_id)
+
+            if repo.are_todays_hours_saved():
+                repo.take_screenshot()
+                return
+
+            add_worktime_id = 'prlWTEP_uwtWorkTimetd1'
+            repo.navigate_to_id(add_worktime_id)
+            start_worktime_input_element_id = 'prlWTEP_uwtWorkTime__ctl1_txtStart'
+
+            if repo.is_element_visible(start_worktime_input_element_id):
+                start_worktime_input_element = repo.driver.find_element_by_id(
+                    start_worktime_input_element_id)
+                start_worktime_input_element.send_keys(start)
+                end_worktime_input_element = repo.driver.find_element_by_id(
+                    'prlWTEP_uwtWorkTime__ctl1_txtEnd')
+                end_worktime_input_element.send_keys(end)
+                check_remove_break_time_id = 'prlWTEP_uwtWorkTime__ctl1_chkRemoveBreakTime'
+                repo.driver.find_element_by_id(check_remove_break_time_id).click()
+
+                worktime_task_id1 = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_cboProject'
+                # Option value 498 equals to
+                # 9996  OPETUS JA OHJAUS 408 HETI PVÄ 100 Tutkintokoulutus
+                repo.click_option_value_from_dropdown_menu(worktime_task_id1, '498')
+                time.sleep(10)
+                working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask1_txtDuration'
+                working_hours_amount = repo.driver.find_element_by_id(
+                    working_hours_amount_id)
+                working_hours_amount.send_keys('05:00')
+
+                worktime_task_id2 = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask2_cboProject'
+                # Option value 599 equals to
+                # 4058 Osaamisen pelimerkit
+                repo.click_option_value_from_dropdown_menu(worktime_task_id2, '599')
+                time.sleep(10)
+                working_hours_amount_id = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask2_txtDuration'
+                working_hours_amount = repo.driver.find_element_by_id(
+                    working_hours_amount_id)
+                working_hours_amount.send_keys('05:07')
+                repo.save_working_hours()
+
+                browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
+                repo.navigate_to_id(browse_worktime_id)
+
+                worktimes_id = 'prlWTEPuwtWorkTimectl0ctlWorkTimeViewSelector1UWTS1_1'
+                if repo.is_element_visible(worktimes_id):
+                    if repo.are_todays_hours_saved():
+                        repo.take_screenshot()
+        finally:
+            repo.driver.quit()
 
     def delete_duplicate(self):
         try:
@@ -276,6 +344,9 @@ if __name__ == '__main__':
     import argparse
     import sys
 
+    run = ScriptRuns()
+    mail = Mail()
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--daily',
                         help='Run daily run of saving working hours.',
@@ -295,8 +366,6 @@ if __name__ == '__main__':
         sys.exit(1)
         
     args = parser.parse_args()
-    run = ScriptRuns()
-    mail = Mail()
     
     if args.daily and len(sys.argv) == 2:
         run.daily()
