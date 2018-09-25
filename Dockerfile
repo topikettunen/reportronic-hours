@@ -12,9 +12,6 @@ RUN mkdir app
 
 COPY config.json /app/
 
-# Remove in prod.
-COPY config-test.json /app/
-
 COPY requirements.txt /app/
 COPY reportronic-hours.py /app/
 COPY xvfb-run-script.sh /app/
