@@ -14,7 +14,7 @@ COPY config.json /app/
 
 COPY requirements.txt /app/
 COPY reportronic-hours.py /app/
-COPY xvfb-run-script.sh /app/
+COPY utils/xvfb-run-script.sh /app/
 RUN chmod +x /app/xvfb-run-script.sh
 
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.22.0/geckodriver-v0.22.0-linux64.tar.gz
