@@ -7,6 +7,5 @@ done
 
 rm -r pics/* 2> /dev/null || true
 rm -r logs/* 2> /dev/null || true
-rm *.log 2> /dev/null || true
 
-pipenv run python reportronic-hours.py $1
+python3 reportronic-hours.py $@

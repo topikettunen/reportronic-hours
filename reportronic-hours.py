@@ -374,15 +374,19 @@ if __name__ == '__main__':
     if args.daily and len(sys.argv) == 2:
         run.daily()
         mail.send()
+        sys.exit(0)
     elif args.monthly and len(sys.argv) == 2:
         run.monthly()
         mail.send()
+        sys.exit(0)
     elif args.delete_duplicate and len(sys.argv) == 2:
         run.delete_duplicate()
         mail.send()
+        sys.exit(0)
     elif args.friday and len(sys.argv) == 2:
         run.friday()
         mail.send()
+        sys.exit(0)
     else:
         parser.print_help()
         sys.exit(1)
