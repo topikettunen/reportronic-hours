@@ -8,6 +8,8 @@
 $ git clone git@github.com:topikettunen/reportronic-hours.git
 ```
 
+- Download [geckodriver](https://github.com/mozilla/geckodriver/releases) and insert it in PATH in Linux/macOS or root of this repo on Windows.
+
 - Install dependencies (with `pipenv`):
 
 ```
