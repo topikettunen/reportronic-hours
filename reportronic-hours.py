@@ -305,6 +305,12 @@ class ScriptRuns:
                 working_hours_amount = repo.driver.find_element_by_id(
                     working_hours_amount_id)
                 working_hours_amount.send_keys('05:07')
+
+                working_hours_description = 'prlWTEP_uwtWorkTime__ctl1_ctlWorkTimeTask2_txtDescription1'
+                description_element = repo.driver.find_element_by_id(
+                    working_hours_description)
+                description_element.send_keys('Osaamismerkkien määritystä.')
+
                 repo.save_working_hours()
 
                 browse_worktime_id = 'CtlMenu1_CtlNavBarMain1_ctlNavBarWorkT1_lnkSelaaTyoaika'
