@@ -1,14 +1,35 @@
 # Reportronic Hours
 
+## Requirements
+
+- Firefox
+
+- Docker
+
 ## Local Install
 
-- Clone this repository
+### Clone this repository
 
 ```
 $ git clone git@github.com:topikettunen/reportronic-hours.git
 ```
 
-- Download [geckodriver](https://github.com/mozilla/geckodriver/releases) and insert it in PATH in Linux/macOS or root of this repo on Windows.
+### Geckodriver
+
+- E.g. on Linux (Check for latest version from link above)
+
+```
+$ wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+$ tar xvzf https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+$ mv geckodriver /usr/local/bin/
+```
+
+- E.g. on Windows
+
+[Download Geckodriver for Win64](https://github.com/mozilla/geckodriver/releases),
+unzip it and move `geckodriver.exe`to the root of this repository.
+
+### Dependencies
 
 - Install dependencies (with `pipenv`):
 
@@ -51,20 +72,20 @@ Possible options currently are:
 
 ## Run Script in Docker container
 
-- Clone repo:
+### Clone repo:
 
 ```
 $ git clone git@github.com:topikettunen/reportronic-hours.git
 ```
 
-- Build the image:
+### Build the image:
 
 ```
 $ cd reportronic-hours
 $ docker build -t reportronic-hours .
 ```
 
-- Run the script inside Docker container:
+### Run the script inside Docker container:
 
 ```
 $ docker run --rm reportronic-hours --daily
