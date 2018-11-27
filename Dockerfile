@@ -26,4 +26,6 @@ WORKDIR /app
 
 RUN pip3 install -r requirements.txt
 
+RUN mkdir /app/pics
+
 ENTRYPOINT [ "/app/xvfb-run-script.sh" ]
