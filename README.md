@@ -20,7 +20,7 @@ $ git clone git@github.com:topikettunen/reportronic-hours.git
 
 ```
 $ wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
-$ tar xvzf https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
+$ tar geckodriver-v0.23.0-linux64.tar.gz
 $ mv geckodriver /usr/local/bin/
 ```
 
